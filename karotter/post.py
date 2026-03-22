@@ -61,6 +61,6 @@ class Post(SmallPost):
     visibility: PostVisibility
     viewerCircle: Optional[int] = None
     replyCircle: Optional[int] = None
-    poll: Optional[int] = None  # 型知らん
+    poll: Optional[Poll] = None
     bookmarked: bool
     bookmarksCount: int
