@@ -16,13 +16,31 @@ class SmallPost(BaseModel):
     mediaUrls: List[str] = []
 
 
+class PollOption(BaseModel):
+    id: int
+    text: str
+    position: int
+    votesCount: int
+    percentage: int
+    votedByMe: bool
+
+
+class Poll(BaseModel):
+    id: int
+    expiresAt: datetime
+    isExpired: bool
+    totalVotes: int
+    ownVoteOptionId: Optional[int] = None
+    options: List[PollOption] = []
+
+
 class Post(SmallPost):
     authorId: int
     parentId: Optional[int] = None
     quotedPostId: Optional[int] = None
     mediaAlts: List[str] = []
-    mediaSpoilerFlags: List[bool] = []  # boolじゃないかも
-    mediaR18Flags: List[bool] = []  # boolじゃないかも
+    mediaSpoilerFlags: List[bool] = []
+    mediaR18Flags: List[bool] = []
     embedUrl: Optional[str] = None
     embedTitle: Optional[str] = None
     embedDescription: Optional[str] = None
