@@ -1,4 +1,5 @@
 # karotter.py
+
 [Karotter](https://karotter.com)のAPIライブラリ。
 
 > [!NOTE]
@@ -26,3 +27,7 @@ cd karotter.py
 uv sync
 # success! コードをいじろう！
 ```
+
+# Todo
+
+- [ ] ログイン時にクライアントユーザーを更新（新しくクラスを作成）

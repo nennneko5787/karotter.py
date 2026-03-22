@@ -5,49 +5,20 @@ from pydantic import BaseModel
 
 from .enums import Gender, OnlineStatus, Visibility
 
-"""
-{
-    "user": {
-        "id": 193,
-        "username": "HIKAKIN",
-        "displayName": "HIKAKIN 公式",
-        "avatarUrl": "/uploads/avatars/avatar_193_1774174773063.webp",
-        "avatarFrameId": null,
-        "pinnedPostId": null,
-        "headerUrl": null,
-        "bio": "ヒカキンですよ。",
-        "birthday": null,
-        "birthdayVisibility": "PRIVATE",
-        "birthdayBalloonsEnabled": true,
-        "gender": "OTHER",
-        "officialMark": "NONE",
-        "websiteUrl": "",
-        "location": null,
-        "isPrivate": false,
-        "onlineStatus": "OFFLINE",
-        "statusMessage": null,
-        "onlineStatusVisibility": "PUBLIC",
-        "followersCount": 1,
-        "followingCount": 0,
-        "postsCount": 1,
-        "isPremium": false,
-        "createdAt": "2026-03-22T10:18:35.750Z",
-        "userBadges": [],
-        "age": null,
-        "badges": []
-    },
-    "isFollowing": true,
-    "isFollowedBy": false,
-    "isBlocked": false,
-    "hasBlocked": false,
-    "isBlockedBy": false,
-    "isMuted": false,
-    "hasPendingRequest": false,
-    "mutualFollowersPreview": [],
-    "mutualFollowersCount": 0,
-    "pinnedPost": null
-}
-"""
+__all__ = (
+    "ClientUser",
+    "Author",
+    "User",
+)
+
+
+class ClientUser(BaseModel):
+    id: int
+    username: str
+    displayName: str
+    email: str
+    avatarUrl: Optional[str] = None
+    emailVerified: bool
 
 
 class Author(BaseModel):
@@ -68,7 +39,7 @@ class User(Author):
     birthdayBalloonsEnabled: bool
     gender: Gender
     officialMark: str  # 知らん後でまとめる
-    websiteUrl: str
+    websiteUrl: Optional[str] = None
     location: Optional[str] = None
     onlineStatus: OnlineStatus
     statusMessage: Optional[str] = None
