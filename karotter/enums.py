@@ -6,6 +6,18 @@ class Visibility(StrEnum):
     PUBLIC = "PUBLIC"
 
 
+class PostVisibility(StrEnum):
+    PUBLIC = "PUBLIC"
+    CIRCLE = "CIRCLE"
+
+
+class ReplyRestriction(StrEnum):
+    EVERYONE = "EVERYONE"
+    FOLLOWING = "FOLLOWING"
+    MENTIONED = "MENTIONED"
+    CIRCLE = "CIRCLE"
+
+
 class Gender(StrEnum):
     MALE = "MALE"
     FEMALE = "FEMALE"

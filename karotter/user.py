@@ -50,12 +50,16 @@ from .enums import Gender, OnlineStatus, Visibility
 """
 
 
-class User(BaseModel):
+class Author(BaseModel):
     id: int
     username: str
     displayName: str
     avatarUrl: Optional[str] = None
     avatarFrameId: Optional[int] = None
+    isPrivate: bool = False
+
+
+class User(Author):
     pinnedPostId: Optional[int] = None
     headerUrl: Optional[str] = None
     bio: Optional[str] = None
@@ -66,7 +70,6 @@ class User(BaseModel):
     officialMark: str  # 知らん後でまとめる
     websiteUrl: str
     location: Optional[str] = None
-    isPrivate: bool
     onlineStatus: OnlineStatus
     statusMessage: Optional[str] = None
     onlineStatusVisibility: Visibility
