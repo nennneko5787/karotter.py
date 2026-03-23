@@ -7,21 +7,32 @@ from typing import Any, Dict, List, Optional, Union
 
 import httpx
 
-from . import constants as Constants
+import karotter
+
+from .constants import Constants
 from .enums import Gender, PostVisibility, ReplyRestriction
 from .exceptions import KarotterClientError, KarotterServerError
 from .post import Post
-from .responses import LoginResponse
-from .user import User
+from .responses import LoginResponse, UserResponse
+from .user import Me, User
 
 __all__ = ("KarotterHTTP",)
 
 
 class KarotterHTTP:
-    def __init__(self, http: Optional[httpx.AsyncClient] = None):
-        self.http: httpx.AsyncClient = http or httpx.AsyncClient()
+    def __init__(
+        self,
+        http: Optional[httpx.AsyncClient] = None,
+        *,
+        apiKey: Optional[str] = None,
+    ):
+        self.http: httpx.AsyncClient = http or httpx.AsyncClient(
+            headers={"user-agent": f"karotter.py/{karotter.__version__}"}
+        )
+        self.http.headers.update({"X-Client-Type": "web"})
         self.http.base_url = "https://karotter.com/api/"
-        self.loginResponse: Optional[LoginResponse] = None
+
+        self.apiKey: Optional[str] = apiKey
 
     async def get(
         self,
@@ -31,13 +42,10 @@ class KarotterHTTP:
         csrf: bool = False,
         **kwargs,
     ) -> Dict[str, str]:
-        if csrf:
+        if self.apiKey:
+            self.http.headers.update({"Authorization": self.apiKey})
+        elif csrf:
             self.http.headers.update({"X-Csrf-Token": await self.getCSRFToken()})
-
-        if self.loginResponse:
-            self.http.headers.update(
-                {"Authorization": f"Bearer {self.loginResponse.accessToken}"}
-            )
 
         response = await self.http.get(url, params=params, **kwargs)
 
@@ -58,13 +66,10 @@ class KarotterHTTP:
         csrf: bool = False,
         **kwargs,
     ) -> Dict[str, str]:
-        if csrf:
+        if self.apiKey:
+            self.http.headers.update({"Authorization": self.apiKey})
+        elif csrf:
             self.http.headers.update({"X-Csrf-Token": await self.getCSRFToken()})
-
-        if self.loginResponse:
-            self.http.headers.update(
-                {"Authorization": f"Bearer {self.loginResponse.accessToken}"}
-            )
 
         response = await self.http.post(
             url, headers=headers, json=json, data=data, **kwargs
@@ -83,10 +88,11 @@ class KarotterHTTP:
     async def login(
         self, identifier: str, password: str, gender: Gender
     ) -> LoginResponse:
-        deviceId = str(uuid.uuid4())
-        self.http.headers.update({"X-Client-Type": "web"})
-        self.http.headers.update({"X-Device-Id": deviceId})
+        if self.apiKey:
+            raise NotImplementedError("APIキー使用時はログインAPIを利用できません。")
 
+        deviceId = str(uuid.uuid4())
+        self.http.headers.update({"X-Device-Id": deviceId})
         response = await self.post(
             "auth/login",
             json={
@@ -98,15 +104,14 @@ class KarotterHTTP:
                 "deviceName": Constants.DEVICE_NAME,
             },
         )
-        self.loginResponse = LoginResponse.model_validate(response)
-        return self.loginResponse
+        return LoginResponse.model_validate(response)
 
-    async def me(self) -> User:
+    async def me(self) -> Me:
         response = await self.get(
             "auth/me",
         )
 
-        return User.model_validate(response["user"])
+        return Me.model_validate(response["user"])
 
     async def createPost(
         self,
@@ -127,14 +132,16 @@ class KarotterHTTP:
         media: Optional[Union[os.PathLike, io.BufferedIOBase]] = None,
     ) -> Post:
         data: dict[str, Any] = {
-            "content": "content",
+            "content": content,
             "isAiGenerated": isAiGenerated,
             "isPromotional": isPromotional,
             "visibility": visibility.value,
             "replyRestriction": replyRestriction.value,
             "mediaAlts": json.dumps(mediaAlts) if mediaAlts else "[]",
-            "mediaSpoilerFlags": json.dumps(mediaAlts) if mediaAlts else "[]",
-            "mediaR18Flags": json.dumps(mediaAlts) if mediaAlts else "[]",
+            "mediaSpoilerFlags": json.dumps(mediaSpoilerFlags)
+            if mediaSpoilerFlags
+            else "[]",
+            "mediaR18Flags": json.dumps(mediaR18Flags) if mediaR18Flags else "[]",
         }
 
         if visibility == PostVisibility.CIRCLE:
@@ -155,11 +162,8 @@ class KarotterHTTP:
         elif isinstance(media, io.BufferedIOBase):
             data.update({"media": media})
 
-        print(data)
-
         jsonData = await self.post(
             "posts",
-            headers={"Content-type": "multipart/form-data"},
             data=data,
             csrf=True,
         )
@@ -168,3 +172,6 @@ class KarotterHTTP:
             f.close()
 
         return Post.model_validate(jsonData["post"])
+
+    async def getUserByUserName(self, userName: str) -> UserResponse:
+        return UserResponse.model_validate(await self.get(f"users/{userName}"))

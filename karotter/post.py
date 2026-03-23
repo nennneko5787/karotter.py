@@ -1,16 +1,19 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Literal, Optional
 
 from pydantic import BaseModel
 
-from .enums import PostVisibility, ReplyRestriction
+from .enums import PostVisibility, ReplyRestriction, ReplySource
 from .user import Author
 
 __all__ = (
     "SmallPost",
     "PollOption",
     "Poll",
+    "BasePost",
     "Post",
+    "PinnedPost",
+    "ReplyTarget",
 )
 
 
@@ -41,17 +44,28 @@ class Poll(BaseModel):
     options: List[PollOption] = []
 
 
-class Post(SmallPost):
+class ReplyTarget(BaseModel):
+    id: int
+    postId: int
+    userId: int
+    source: ReplySource
+    createdAt: datetime
+    user: Author
+
+
+class ReactionSummary(BaseModel):
+    emoji: str
+    count: str
+    reacted: bool
+
+
+class BasePost(SmallPost):
     authorId: int
     parentId: Optional[int] = None
     quotedPostId: Optional[int] = None
     mediaAlts: List[str] = []
     mediaSpoilerFlags: List[bool] = []
     mediaR18Flags: List[bool] = []
-    embedUrl: Optional[str] = None
-    embedTitle: Optional[str] = None
-    embedDescription: Optional[str] = None
-    embedImage: Optional[str] = None
     likesCount: int
     rekarotsCount: int
     repliesCount: int
@@ -71,3 +85,59 @@ class Post(SmallPost):
     poll: Optional[Poll] = None
     bookmarked: bool
     bookmarksCount: int
+    replyToUsers: List[Author] = []
+    replyTargets: List[ReplyTarget] = []
+    reactionSummary: List[ReactionSummary] = []
+    comment: Optional[str] = None
+    canInteract: bool
+    canQuote: bool
+    hasBlockedAuthor: bool
+    isMutedByViewer: bool
+    itemId: str
+    quoteUsersCount: int
+    rekaroted: bool
+    rekarotedBy: Optional[Author] = None
+    rekarots: List[Any] = []
+    replyCircle: Optional[Any] = None  # サークルを実装しよう
+    time: datetime
+    type: Literal["REKAROT", "POST"]
+
+
+class Post(BasePost):
+    embedUrl: Optional[str] = None
+    embedTitle: Optional[str] = None
+    embedDescription: Optional[str] = None
+    embedImage: Optional[str] = None
+
+
+class PinnedPost(SmallPost):
+    parentId: Optional[int] = None
+    quotedPostId: Optional[int] = None
+    mediaAlts: List[str] = []
+    mediaSpoilerFlags: List[bool] = []
+    mediaR18Flags: List[bool] = []
+    likesCount: int
+    rekarotsCount: int
+    repliesCount: int
+    replyCircleId: Optional[int] = None
+    excludedMentions: List[int] = []  # 型がわからん
+    isAiGenerated: bool
+    isPromotional: bool
+    editedAt: Optional[datetime] = None
+    createdAt: datetime
+    viewerCircleId: Optional[int] = None
+    viewerCircle: Optional[int] = None
+    replyCircle: Optional[int] = None
+    poll: Optional[Poll] = None
+    replyToUsers: List[Author] = []
+    replyTargets: List[ReplyTarget] = []
+    reactionSummary: List[ReactionSummary] = []
+    comment: Optional[str] = None
+    itemId: str
+    quoteUsersCount: int
+    rekaroted: bool
+    rekarotedBy: Optional[Author] = None
+    rekarots: List[Any] = []
+    replyCircle: Optional[Any] = None  # サークルを実装しよう
+    time: datetime
+    type: Literal["POST"]

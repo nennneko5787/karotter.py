@@ -4,4 +4,8 @@ version = "0.0.1"
 description = "A library for Karotter.com"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["httpx>=0.28.1", "pydantic>=2.12.5"]
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.12.5",
+    "python-socketio>=5.16.1",
+]

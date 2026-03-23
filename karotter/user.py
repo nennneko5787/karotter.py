@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from .enums import Gender, OnlineStatus, Visibility
+from .enums import Gender, OfficialMark, OnlineStatus, Visibility
 
 __all__ = (
     "ClientUser",
@@ -28,6 +28,7 @@ class Author(BaseModel):
     avatarUrl: Optional[str] = None
     avatarFrameId: Optional[int] = None
     isPrivate: bool = False
+    officialMark: OfficialMark = OfficialMark.NONE
 
 
 class User(Author):
@@ -37,8 +38,6 @@ class User(Author):
     birthday: Optional[str] = None
     birthdayVisibility: Visibility
     birthdayBalloonsEnabled: bool
-    gender: Gender
-    officialMark: str  # 知らん後でまとめる
     websiteUrl: Optional[str] = None
     location: Optional[str] = None
     onlineStatus: OnlineStatus
@@ -52,3 +51,7 @@ class User(Author):
     userBadges: List[str] = []
     age: Optional[int] = None
     badges: List[str] = []
+
+
+class Me(User):
+    gender: Gender

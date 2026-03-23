@@ -1,8 +1,9 @@
-from typing import Any, List
+from typing import List, Optional
 
 from pydantic import UUID4, BaseModel
 
-from .user import ClientUser, User
+from .post import PinnedPost
+from .user import Author, ClientUser, User
 
 __all__ = (
     "UserResponse",
@@ -26,6 +27,6 @@ class UserResponse(BaseModel):
     isBlockedBy: bool
     isMuted: bool
     hasPendingRequest: bool
-    mutualFollowersPreview: List[User] = []  # わんちゃんidかも？
+    mutualFollowersPreview: List[Author] = []
     mutualFollowersCount: int
-    pinnedPost: List[Any]  # あとで投稿をクラス化する
+    pinnedPost: Optional[PinnedPost] = None

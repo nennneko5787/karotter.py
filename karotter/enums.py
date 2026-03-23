@@ -6,6 +6,8 @@ __all__ = (
     "ReplyRestriction",
     "Gender",
     "OnlineStatus",
+    "OfficialMark",
+    "ReplySource",
 )
 
 
@@ -37,3 +39,14 @@ class OnlineStatus(StrEnum):
     IDLE = "IDLE"
     DND = "DND"
     ONLINE = "ONLINE"
+
+
+class OfficialMark(StrEnum):
+    NONE = "NONE"
+    BLUE = "BLUE"
+    YELLOW = "YELLOW"
+    PURPLE = "PURPLE"
+
+
+class ReplySource(StrEnum):
+    THREAD_PARTICIPANT = "THREAD_PARTICIPANT"

@@ -1,1 +1,5 @@
-DEVICE_NAME = "Karotter.py"
+__all__ = ("Constants",)
+
+
+class Constants:
+    DEVICE_NAME = "Karotter.py"

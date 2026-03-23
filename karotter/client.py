@@ -8,17 +8,19 @@ import httpx
 from .enums import Gender, PostVisibility, ReplyRestriction
 from .http import KarotterHTTP
 from .post import Post
-from .responses import LoginResponse
-from .user import ClientUser, User
+from .responses import LoginResponse, UserResponse
+from .user import ClientUser, Me, User
 
 __all__ = ("Karotter",)
 
 
 class Karotter:
-    def __init__(self, *, http: Optional[httpx.AsyncClient] = None):
-        self.http: KarotterHTTP = KarotterHTTP(http)
+    def __init__(
+        self, *, http: Optional[httpx.AsyncClient] = None, apiKey: Optional[str] = None
+    ):
+        self.http: KarotterHTTP = KarotterHTTP(http, apiKey=apiKey)
         self.clientUser: Optional[ClientUser] = None
-        self.user: Optional[User] = None
+        self.user: Optional[Me] = None
 
     async def login(
         self, identifier: str, password: str, gender: Gender
@@ -42,9 +44,19 @@ class Karotter:
 
         response = await self.http.login(identifier, password, gender)
         self.clientUser = response.user
+        return response
+
+    async def me(self) -> Me:
+        """現在のセッションの完全なユーザーを取得します。
+
+        Returns
+        -------
+        User
+            現在のセッションの完全なユーザー。
+        """
 
         self.user = await self.http.me()
-        return response
+        return self.user
 
     async def createPost(
         self,
@@ -119,3 +131,6 @@ class Karotter:
             scheduledFor=scheduledFor,
             media=media,
         )
+
+    async def getUserByUserName(self, userName: str) -> UserResponse:
+        return await self.http.getUserByUserName(userName)
