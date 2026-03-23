@@ -9,7 +9,7 @@ from .enums import Gender, PostVisibility, ReplyRestriction
 from .http import KarotterHTTP
 from .post import Post
 from .responses import LoginResponse, UserResponse
-from .user import ClientUser, Me, User
+from .user import ClientUser, Me
 
 __all__ = ("Karotter",)
 

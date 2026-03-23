@@ -3,6 +3,7 @@ from typing import Any, List, Literal, Optional
 
 from pydantic import BaseModel
 
+from .circle import Circle
 from .enums import PostVisibility, ReplyRestriction, ReplySource
 from .user import Author
 
@@ -55,12 +56,11 @@ class ReplyTarget(BaseModel):
 
 class ReactionSummary(BaseModel):
     emoji: str
-    count: str
+    count: int
     reacted: bool
 
 
-class BasePost(SmallPost):
-    authorId: int
+class CommonPostFields(SmallPost):
     parentId: Optional[int] = None
     quotedPostId: Optional[int] = None
     mediaAlts: List[str] = []
@@ -69,37 +69,41 @@ class BasePost(SmallPost):
     likesCount: int
     rekarotsCount: int
     repliesCount: int
-    viewsCount: int
-    replyRestriction: ReplyRestriction
     replyCircleId: Optional[int] = None
     excludedMentions: List[int] = []  # 型がわからん
     isAiGenerated: bool
     isPromotional: bool
     editedAt: Optional[datetime] = None
     createdAt: datetime
-    updatedAt: datetime
     viewerCircleId: Optional[int] = None
-    visibility: PostVisibility
     viewerCircle: Optional[int] = None
-    replyCircle: Optional[int] = None
+    replyCircle: Optional[Circle] = None
     poll: Optional[Poll] = None
-    bookmarked: bool
-    bookmarksCount: int
     replyToUsers: List[Author] = []
     replyTargets: List[ReplyTarget] = []
     reactionSummary: List[ReactionSummary] = []
+    reactionsCount: int
     comment: Optional[str] = None
-    canInteract: bool
-    canQuote: bool
-    hasBlockedAuthor: bool
-    isMutedByViewer: bool
     itemId: str
     quoteUsersCount: int
     rekaroted: bool
     rekarotedBy: Optional[Author] = None
     rekarots: List[Any] = []
-    replyCircle: Optional[Any] = None  # サークルを実装しよう
     time: datetime
+
+
+class BasePost(CommonPostFields):
+    authorId: int
+    updatedAt: datetime
+    replyRestriction: ReplyRestriction
+    viewsCount: int
+    bookmarked: bool
+    bookmarksCount: int
+    canInteract: bool
+    canQuote: bool
+    hasBlockedAuthor: bool
+    isMutedByViewer: bool
+    visibility: PostVisibility
     type: Literal["REKAROT", "POST"]
 
 
@@ -110,34 +114,5 @@ class Post(BasePost):
     embedImage: Optional[str] = None
 
 
-class PinnedPost(SmallPost):
-    parentId: Optional[int] = None
-    quotedPostId: Optional[int] = None
-    mediaAlts: List[str] = []
-    mediaSpoilerFlags: List[bool] = []
-    mediaR18Flags: List[bool] = []
-    likesCount: int
-    rekarotsCount: int
-    repliesCount: int
-    replyCircleId: Optional[int] = None
-    excludedMentions: List[int] = []  # 型がわからん
-    isAiGenerated: bool
-    isPromotional: bool
-    editedAt: Optional[datetime] = None
-    createdAt: datetime
-    viewerCircleId: Optional[int] = None
-    viewerCircle: Optional[int] = None
-    replyCircle: Optional[int] = None
-    poll: Optional[Poll] = None
-    replyToUsers: List[Author] = []
-    replyTargets: List[ReplyTarget] = []
-    reactionSummary: List[ReactionSummary] = []
-    comment: Optional[str] = None
-    itemId: str
-    quoteUsersCount: int
-    rekaroted: bool
-    rekarotedBy: Optional[Author] = None
-    rekarots: List[Any] = []
-    replyCircle: Optional[Any] = None  # サークルを実装しよう
-    time: datetime
+class PinnedPost(CommonPostFields):
     type: Literal["POST"]

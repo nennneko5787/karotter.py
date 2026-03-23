@@ -14,7 +14,7 @@ from .enums import Gender, PostVisibility, ReplyRestriction
 from .exceptions import KarotterClientError, KarotterServerError
 from .post import Post
 from .responses import LoginResponse, UserResponse
-from .user import Me, User
+from .user import Me
 
 __all__ = ("KarotterHTTP",)
 
@@ -130,6 +130,7 @@ class KarotterHTTP:
         pollDurationHours: Optional[int] = None,
         scheduledFor: Optional[datetime] = None,
         media: Optional[Union[os.PathLike, io.BufferedIOBase]] = None,
+        parentId: Optional[int] = None,
     ) -> Post:
         data: dict[str, Any] = {
             "content": content,
@@ -154,6 +155,8 @@ class KarotterHTTP:
             data.update({"pollDurationHours": pollDurationHours})
         if scheduledFor:
             data.update({"scheduledFor": scheduledFor.isoformat()})
+        if parentId:
+            data.update({"parentId": parentId})
 
         f = None
         if isinstance(media, os.PathLike):
@@ -175,3 +178,6 @@ class KarotterHTTP:
 
     async def getUserByUserName(self, userName: str) -> UserResponse:
         return UserResponse.model_validate(await self.get(f"users/{userName}"))
+
+    async def toggleFollow(self, id: int):
+        await self.post(f"follow/{id}")
